@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta
+      charset="UTF-8"
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>2027 未は日の出を見られるか！？</title>
+    <style>
+      /* 画面の不要な余白を消し、スクロールバーが出ないようにする */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden; /* スクロールバーを完全に非表示に */
+      }
+
+      /* canvasを画面全体に固定配置する */
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block; /* 謎の隙間（インライン要素の隙間）を消す */
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      <!-- ----------------------------------------------------------------------- -->
+      <!--                                 Canvas                                  -->
+      <!-- ----------------------------------------------------------------------- -->
+      // Canvasのサイズをブラウザの画面サイズに合わせる関数
+      function resizeCanvas() {
+        // 内部解像度（描画サイズ）を現在の画面幅に合わせる
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        // サイズ変更後に再描画する処理（例: 背景を黒、真ん中に円を描画）
+        // 背景クリア
+        const gradient = ctx.createLinearGradient(0, 0, 200, 200);
+        gradient.addColorStop(0, "red"); // 開始の色
+        gradient.addColorStop(0.5, "yellow"); // 中間の色
+        gradient.addColorStop(1, "blue"); // 終了の色
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = canvas.height / 25;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+      }
+      // ページ読み込み時と、画面サイズ変更（リサイズ）時に実行する
+      window.addEventListener("load", resizeCanvas);
+      window.addEventListener("resize", resizeCanvas);
+
+      <!-- ----------------------------------------------------------------------- -->
+      <!--                                 Classes                                 -->
+      <!-- ----------------------------------------------------------------------- -->
+      //gamestate
+      var gamestate = "title";
+
+      // -- particle --
+      class touchParticle {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.life = 1.0;
+        }
+        update(deltaTime) {
+          this.life -= 0.05 * deltaTime * 60;
+          if (this.life < 0) this.life = 0;
+          ctx.strokeStyle = "rgba(255,255,255," + this.life + ")";
+          ctx.lineWidth = 10 * (1 - this.life ** 2);
+          ctx.beginPath();
+          ctx.setLineDash([canvas.height/85*this.life, canvas.height/85*this.life]);
+          ctx.arc(this.x, this.y, 32 * this.life, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.closePath();
+          ctx.setLineDash([]);
+        }
+      }
+      var touchParticles = [];
+
+      // -- UI --
+      // Button
+      class Button {
+        constructor(x, y, cont, show) {
+          this.x = x;
+          this.y = y;
+          this.cont = cont;
+          this.show = show;
+          this.alpha = 1.0;
+          this.lsize = canvas.height;
+        }
+        update(deltaTime, op, value = 0, size = 1) {
+          switch (op) {
+            case "add":
+              if (this.cont !== gamestate && value < 0) {
+                this.alpha = 0;
+                break;
+              }
+              if (this.alpha >= 0 && this.alpha <= 1) {
+                this.alpha += value * deltaTime * 60;
+              }
+              if (this.alpha > 1) this.alpha = 1;
+              if (this.alpha < 0) this.alpha = 0;
+              break;
+          }
+          this.lsize = canvas.height * this.alpha ** 2;
+          ctx.fillStyle = "rgba(200,200,200," + this.alpha + ")";
+          ctx.beginPath();
+          ctx.roundRect(
+            canvas.width * this.x - this.lsize / 6 - this.lsize / 26,
+            canvas.height * this.y - this.lsize / 26,
+            this.lsize / 3 + this.lsize / 13,
+            this.lsize / 13,
+            this.lsize / 26,
+          );
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255," + this.alpha ** 2 + ")";
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.roundRect(
+            canvas.width * this.x - this.lsize / 6 - this.lsize / 36,
+            canvas.height * this.y - this.lsize / 36,
+            this.lsize / 3 + this.lsize / 18,
+            this.lsize / 18,
+            this.lsize / 36,
+          );
+          ctx.stroke();
+          ctx.closePath();
+        }
+        checkClick(x, y) {
+          if (
+            this.alpha > 0.5 &&
+            x > canvas.width * this.x - this.lsize / 6 - this.lsize / 26 &&
+            x < canvas.width * this.x + this.lsize / 6 + this.lsize / 26 &&
+            y > canvas.height * this.y - this.lsize / 26 &&
+            y < canvas.height * this.y + this.lsize / 26
+          ) {
+            gamestate = this.cont;
+          }
+        }
+      }
+      var buttons = [
+        new Button(0.5, 0.6, "start", "title"),
+        new Button(0.5, 0.75, "contact", "title"),
+      ];
+
+      <!-- ----------------------------------------------------------------------- -->
+      <!--                                gameloop                                 -->
+      <!-- ----------------------------------------------------------------------- -->
+      let lastTime = 0;
+      const gameLoop = (timeStamp) => {
+        //-- 時間制御 準備 --
+        if (!lastTime) lastTime = timeStamp; // 初回のみlastTimeを初期化
+        let deltaTime = (timeStamp - lastTime) / 1000; // ms単位に変換
+        lastTime = timeStamp;
+
+        //-- 背景 --
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const gradient = ctx.createLinearGradient(
+          canvas.width / 2,
+          0,
+          canvas.width / 2,
+          canvas.height,
+        );
+        gradient.addColorStop(0.21, "rgb(142,186,233)"); // 開始の色
+        gradient.addColorStop(0.46, "rgb(255,247,253)"); // 中間の色
+        gradient.addColorStop(0.85, "rgb(255,142,142)"); // 終了の色
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = canvas.height / 25;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+        //-- animations --
+        for (var n of buttons) {
+          if (n.show == gamestate) {
+            n.update(deltaTime, "", 0);
+          } else {
+            n.update(deltaTime, "add", -0.06);
+          }
+        }
+
+        touchParticles.forEach((p) => p.update(deltaTime));
+        touchParticles = touchParticles.filter((p) => p.life > 0);
+
+        requestAnimationFrame(gameLoop);
+      };
+
+      //-- pointer event --
+      //  menndoi
+      let isPointerDown = false;
+      const getCanvasCoord = (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const CanvasX = event.clientX - rect.left;
+        const CanvasY = event.clientY - rect.top;
+        return {
+          x: CanvasX * (canvas.width / rect.width),
+          y: CanvasY * (canvas.height / rect.height),
+        };
+      };
+      canvas.addEventListener("pointerdown", (event) => {
+        isPointerDown = true;
+        const pos = getCanvasCoord(event);
+        touchParticles.push(new touchParticle(pos.x, pos.y));
+      });
+      canvas.addEventListener("pointermove", (event) => {
+        if (isPointerDown) {
+          const pos = getCanvasCoord(event);
+        }
+      });
+      const pointerUpHandler = (event) => {
+        const pos = getCanvasCoord(event);
+        for (var n of buttons) {
+          if (n.show !== gamestate) continue;
+          n.checkClick(pos.x, pos.y);
+        }
+        touchParticles.splice(0, touchParticles.length);
+        isPointerDown = false;
+      };
+      window.addEventListener("pointerup", pointerUpHandler);
+      window.addEventListener("pointercancel", pointerUpHandler);
+
+      gameLoop();
+    </script>
+  </body>
+</html>
