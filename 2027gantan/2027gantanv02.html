@@ -20,12 +20,13 @@
 
       /* canvasを画面全体に固定配置する */
       canvas {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
         display: block; /* 謎の隙間（インライン要素の隙間）を消す */
+        touch-action: none; /* タッチ操作のデフォルト動作を無効化 */
       }
     </style>
   </head>
@@ -80,13 +81,40 @@
           ctx.lineWidth = canvas.height / 100 * (1 - this.life ** 2);
           ctx.beginPath();
           ctx.setLineDash([canvas.height/85*this.life, canvas.height/85*this.life]);
-          ctx.arc(this.x, this.y, (canvas.height / 24) * this.life, 0, Math.PI * 2);
+          ctx.arc(this.x, this.y, (canvas.height / 30) * this.life, 0, Math.PI * 2);
           ctx.stroke();
           ctx.closePath();
           ctx.setLineDash([]);
         }
       }
       var touchParticles = [];
+
+      var dir = {x:1, y:1}
+      class clickParticle {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.life = 1.0;
+        }
+        update(deltaTime) {
+          this.life -= 0.05 * deltaTime * 60;
+          if (this.life < 0) this.life = 0;
+          for (var i = 1; i < 5; i++){
+            switch (i) {
+              case (1):dir = {x: 1, y: 0}; break;
+              case (2):dir = {x: 0, y: 1}; break;
+              case (3):dir = {x: -1, y: 0}; break;
+              case (4):dir = {x: 0, y: -1}; break;
+            }
+            ctx.beginPath();
+            ctx.moveTo(this.x + dir.x * (canvas.height / 24) * (1 - this.life) **2, this.y + dir.y * (canvas.height / 24) * (1 - this.life) **2);
+            ctx.lineTo(this.x + dir.x * (canvas.height / 24) * (1 - this.life) , this.y + dir.y * (canvas.height / 24) * (1 - this.life));
+            ctx.stroke();
+            ctx.closePath();
+          }
+        }
+      }
+      var clickParticles = [];
 
       // -- UI --
       // Button
@@ -197,6 +225,8 @@
 
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
+        clickParticles.forEach((p) => p.update(deltaTime));
+        clickParticles = clickParticles.filter((p) => p.life > 0);
 
         requestAnimationFrame(gameLoop);
       };
@@ -223,6 +253,9 @@
       canvas.addEventListener("pointermove", (event) => {
         if (isPointerDown) {
           const pos = getCanvasCoord(event);
+          if (Math.hypot(pos.x - pointerdownpos.x, pos.y - pointerdownpos.y) > canvas.height / 30) {
+            
+          }
         }
       });
       const pointerUpHandler = (event) => {
@@ -231,11 +264,14 @@
           if (n.show !== gamestate) continue;
           n.checkClick(pos.x, pos.y, pointerdownpos.x, pointerdownpos.y);
         }
-        touchParticles.splice(0, touchParticles.length);
+        clickParticles.push(new clickParticle(pos.x, pos.y));
+        //touchParticles.splice(0, touchParticles.length);
         isPointerDown = false;
       };
       window.addEventListener("pointerup", pointerUpHandler);
-      window.addEventListener("pointercancel", pointerUpHandler);
+      window.addEventListener("pointercancel", () => {
+        isPointerDown = false;
+      });
 
       gameLoop();
     </script>
