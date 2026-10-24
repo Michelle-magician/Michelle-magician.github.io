@@ -80,7 +80,7 @@
           ctx.strokeStyle = "rgba(255,255,255," + this.life + ")";
           ctx.lineWidth = canvas.height / 100 * (1 - this.life ** 2);
           ctx.beginPath();
-          ctx.setLineDash([canvas.height/85*this.life, canvas.height/85*this.life]);
+          ctx.setLineDash([(this.life*canvas.height*0.0001)+canvas.height/85*this.life,(this.life*canvas.height*0.0001)+canvas.height/85*this.life]);
           ctx.arc(this.x, this.y, (canvas.height / 30) * this.life, 0, Math.PI * 2);
           ctx.stroke();
           ctx.closePath();
@@ -107,6 +107,7 @@
               case (4):dir = {x: 0, y: -1}; break;
             }
             ctx.beginPath();
+            ctx.lineWidth = (canvas.height / 25 * (1 - this.life ** 2))*(this.life ** 2);
             ctx.moveTo(this.x + dir.x * (canvas.height / 24) * (1 - this.life) **2, this.y + dir.y * (canvas.height / 24) * (1 - this.life) **2);
             ctx.lineTo(this.x + dir.x * (canvas.height / 24) * (1 - this.life) , this.y + dir.y * (canvas.height / 24) * (1 - this.life));
             ctx.stroke();
@@ -265,7 +266,7 @@
           n.checkClick(pos.x, pos.y, pointerdownpos.x, pointerdownpos.y);
         }
         clickParticles.push(new clickParticle(pos.x, pos.y));
-        //touchParticles.splice(0, touchParticles.length);
+        touchParticles.splice(0, touchParticles.length);
         isPointerDown = false;
       };
       window.addEventListener("pointerup", pointerUpHandler);
