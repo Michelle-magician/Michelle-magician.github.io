@@ -100,7 +100,7 @@
           if (this.life < 0) this.life = 0;
           ctx.beginPath();
           ctx.fillStyle = "rgba(255,255,255," + (this.life/2) + ")";
-          ctx.arc(this.x, this.y, (canvas.height / 200) * this.life, 0, Math.PI * 2);
+          ctx.arc(this.x, this.y, (canvas.height / 200), 0, Math.PI * 2);
           ctx.fill();
           ctx.closePath();
         }
