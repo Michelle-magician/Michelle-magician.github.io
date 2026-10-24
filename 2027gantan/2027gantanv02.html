@@ -78,7 +78,7 @@
           this.life -= 0.05 * deltaTime * 60;
           if (this.life < 0) this.life = 0;
           ctx.strokeStyle = "rgba(255,255,255," + this.life + ")";
-          ctx.lineWidth = (1.2 * canvas.height / 100 * (1 - this.life ** 2));
+          ctx.lineWidth = (1.0 * canvas.height / 100 * (1 - this.life ** 1));
           ctx.beginPath();
           ctx.setLineDash([(this.life*canvas.height*0.0001)+canvas.height/70*this.life,(this.life*canvas.height*0.0001)+canvas.height/70*this.life]);
           ctx.arc(this.x, this.y, (canvas.height / 24) * this.life, 0, Math.PI * 2);
@@ -88,6 +88,24 @@
         }
       }
       var touchParticles = [];
+
+      class dragParticle {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.life = 1.0;
+        }
+        update(deltaTime) {
+          this.life -= 0.05 * deltaTime * 60;
+          if (this.life < 0) this.life = 0;
+          ctx.beginPath();
+          ctx.fillStyle = "rgba(255,255,255," + (this.life/2) + ")";
+          ctx.arc(this.x, this.y, (canvas.height / 200) * this.life, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.closePath();
+        }
+      }
+      var dragParticles = [];
 
       var dir = {x:1, y:1}
       class clickParticle {
@@ -110,7 +128,7 @@
               this.life -= 0.01 * deltaTime * 60;
               if (this.life < 0) this.life = 0;
               ctx.beginPath();
-              ctx.fillStyle = "rgba(255,255,255,0.2)"
+              ctx.fillStyle = "rgba(255,255,255,0.1)"
               ctx.rect(this.x + Math.cos(this.random*Math.PI*2)*canvas.height/25*(1-this.life)**2-(this.size*(1-this.life)/2),this.y + Math.sin(this.random*Math.PI*2)*canvas.height/25*(1-this.life)**2-(this.size*(1-this.life)/2),this.size*(1-this.life),this.size*(1-this.life));
               ctx.fill();
               ctx.fillStyle = "white"
@@ -133,7 +151,7 @@
           }
           this.clickstars = [];
           this.clickstars.push(new clickstar(this.x,this.y,1.0,this.random));
-          this.clickstars.push(new clickstar(this.x,this.y,2.0,this.random));
+          this.clickstars.push(new clickstar(this.x,this.y,2.0,(this.random-0.5)));
         }
         update(deltaTime) {
           this.life -= 0.05 * deltaTime * 60;
@@ -169,6 +187,7 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.restore();*/
+            ctx.strokeStyle = "white"
             ctx.beginPath();
             ctx.lineWidth = (canvas.height / 18 * (1 - this.life ** 2))*(this.life ** 2);
             ctx.moveTo(this.x + dir.x * (canvas.height / 16) * (1 - this.life) **2, this.y + dir.y * (canvas.height / 16) * (1 - this.life) **2);
@@ -292,6 +311,8 @@
 
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
+        dragParticles.forEach((p) => p.update(deltaTime));
+        dragParticles = dragParticles.filter((p) => p.life > 0);
         clickParticles.forEach((p) => p.update(deltaTime));
         clickParticles = clickParticles.filter((p) => p.life > 0);
 
@@ -311,17 +332,20 @@
           y: CanvasY * (canvas.height / rect.height),
         };
       };
+      var outtouch = false
       canvas.addEventListener("pointerdown", (event) => {
         isPointerDown = true;
         const pos = getCanvasCoord(event);
+        outtouch = false
         pointerdownpos = { x: pos.x, y: pos.y };
         touchParticles.push(new touchParticle(pos.x, pos.y));
       });
       canvas.addEventListener("pointermove", (event) => {
         if (isPointerDown) {
           const pos = getCanvasCoord(event);
-          if (Math.hypot(pos.x - pointerdownpos.x, pos.y - pointerdownpos.y) > canvas.height / 30) {
-            
+          if (outtouch ===true || Math.hypot(pos.x - pointerdownpos.x, pos.y - pointerdownpos.y) > canvas.height / 30) {
+            dragParticles.push(new dragParticle(pos.x,pos.y))
+            outtouch = true
           }
         }
       });
@@ -332,7 +356,6 @@
           n.checkClick(pos.x, pos.y, pointerdownpos.x, pointerdownpos.y);
         }
         clickParticles.push(new clickParticle(pos.x, pos.y));
-        clickParticles.clickstars.push(new clickstar(this.x,this.y,1.0));
         touchParticles.splice(0, touchParticles.length);
         isPointerDown = false;
       };
@@ -342,6 +365,7 @@
       });
 
       gameLoop();
+
     </script>
   </body>
 </html>
