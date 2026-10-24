@@ -94,6 +94,8 @@
         constructor(x, y) {
           this.x = x;
           this.y = y;
+          this.vx = (Math.random() - 0.5) * 2;
+          this.vy = (Math.random() - 0.5) * 2;
           this.life = 1.0;
         }
         update(deltaTime) {
@@ -106,6 +108,30 @@
               case (3):dir = {x: -1, y: 0}; break;
               case (4):dir = {x: 0, y: -1}; break;
             }
+            /*ctx.beginPath();
+            ctx.lineWidth = (canvas.height / 14 * (1 - this.life ** 2))*(this.life ** 2);
+            var clickclip = {fromx : this.x + dir.x * (canvas.height / 16) * (1 - this.life) **2
+            , fromy : this.y + dir.y * (canvas.height / 16) * (1 - this.life) **2
+            ,tox : this.x + dir.x * (canvas.height / 16) * (1 - this.life)
+            ,toy : this.y + dir.y * (canvas.height / 16) * (1 - this.life)
+            }
+            ctx.stroke();
+            ctx.closePath();
+            ctx.save();
+            var path=new Path2D();
+            path.rect(clickclip.fromx-canvas.height/200, clickclip.fromy-canvas.height/200, (clickclip.tox - clickclip.fromx) + 2*(canvas.height/200), (clickclip.toy - clickclip.fromy) + 2*(canvas.height/200));
+            ctx.clip(path);
+            //ctx.fillStyle="red"
+            ctx.fillRect((this.x + dir.x * (canvas.height / 16) * (1 - this.life) **2), (this.y + dir.y * (canvas.height / 16) * (1 - this.life) **2), (canvas.height / 16) * (1 - this.life), (canvas.height / 16) * (1 - this.life));
+
+            
+            const gradient = ctx.createLinearGradient(canvas.width / 2,0,canvas.width / 2,canvas.height,);
+            gradient.addColorStop(0.21, "rgb(142,186,233)"); // 開始の色
+            gradient.addColorStop(0.46, "rgb(255,247,253)"); // 中間の色
+            gradient.addColorStop(0.85, "rgb(255,142,142)"); // 終了の色
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();*/
             ctx.beginPath();
             ctx.lineWidth = (canvas.height / 18 * (1 - this.life ** 2))*(this.life ** 2);
             ctx.moveTo(this.x + dir.x * (canvas.height / 16) * (1 - this.life) **2, this.y + dir.y * (canvas.height / 16) * (1 - this.life) **2);
@@ -113,6 +139,7 @@
             ctx.stroke();
             ctx.closePath();
           }
+          
         }
       }
       var clickParticles = [];
