@@ -99,7 +99,7 @@
           this.life -= 0.05 * deltaTime * 60;
           if (this.life < 0) this.life = 0;
           ctx.beginPath();
-          ctx.fillStyle = "rgba(255,255,255," + (this.life/2) + ")";
+          ctx.fillStyle = "rgba(255,255,255," + (this.life**2) + ")";
           ctx.arc(this.x, this.y, (canvas.height / 200), 0, Math.PI * 2);
           ctx.fill();
           ctx.closePath();
@@ -129,7 +129,7 @@
               if (this.life < 0) this.life = 0;
               ctx.beginPath();
               ctx.fillStyle = "rgba(255,255,255,0.1)"
-              ctx.rect(this.x + Math.cos(this.random*Math.PI*2)*canvas.height/25*(1-this.life)**2-(this.size*(1-this.life)/2),this.y + Math.sin(this.random*Math.PI*2)*canvas.height/25*(1-this.life)**2-(this.size*(1-this.life)/2),this.size*(1-this.life),this.size*(1-this.life));
+              ctx.rect(this.x + Math.cos(this.random*Math.PI*2)*canvas.height/25*(1-this.life)**2-(this.size*(1-this.life)*canvas.height/1000/2),this.y + Math.sin(this.random*Math.PI*2)*canvas.height/25*(1-this.life)**2-(this.size*(1-this.life)*canvas.height/1000/2),this.size*(1-this.life)*canvas.height/1000,this.size*(1-this.life)*canvas.height/1000);
               ctx.fill();
               ctx.fillStyle = "white"
               /*
