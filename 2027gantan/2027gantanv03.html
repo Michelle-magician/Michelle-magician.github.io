@@ -357,6 +357,7 @@
         }
         clickParticles.push(new clickParticle(pos.x, pos.y));
         touchParticles.splice(0, touchParticles.length);
+        dragParticles.splice(0, dragParticles.length);
         isPointerDown = false;
       };
       window.addEventListener("pointerup", pointerUpHandler);
