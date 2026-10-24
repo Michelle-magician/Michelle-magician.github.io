@@ -90,18 +90,25 @@
       var touchParticles = [];
 
       class dragParticle {
-        constructor(x, y) {
+        constructor(fx,fy,x, y) {
           this.x = x;
           this.y = y;
+          this.fx = fx;
+          this.fy = fy;
           this.life = 1.0;
         }
         update(deltaTime) {
           this.life -= 0.05 * deltaTime * 60;
           if (this.life < 0) this.life = 0;
           ctx.beginPath();
-          ctx.fillStyle = "rgba(255,255,255," + (this.life**2) + ")";
+          /*ctx.fillStyle = "rgba(255,255,255," + (this.life**2) + ")";
           ctx.arc(this.x, this.y, (canvas.height / 200), 0, Math.PI * 2);
-          ctx.fill();
+          ctx.fill();*/
+          ctx.moveTo(this.x,this.y);
+          ctx.lineTo(this.fx,this.fy);
+          ctx.lineWidth = 10*canvas.height/1000*this.life
+          ctx.strokeStyle = "rgba(255,255,255," + (this.life**2) + ")";
+          ctx.stroke();
           ctx.closePath();
         }
       }
@@ -340,13 +347,15 @@
         pointerdownpos = { x: pos.x, y: pos.y };
         touchParticles.push(new touchParticle(pos.x, pos.y));
       });
+      var frompos = {x : 0,y : 0}
       canvas.addEventListener("pointermove", (event) => {
         if (isPointerDown) {
           const pos = getCanvasCoord(event);
           if (outtouch ===true || Math.hypot(pos.x - pointerdownpos.x, pos.y - pointerdownpos.y) > canvas.height / 30) {
-            dragParticles.push(new dragParticle(pos.x,pos.y))
+            dragParticles.push(new dragParticle(frompos.x,frompos.y,pos.x,pos.y))
             outtouch = true
           }
+          frompos = {x : pos.x,y : pos.y}
         }
       });
       const pointerUpHandler = (event) => {
