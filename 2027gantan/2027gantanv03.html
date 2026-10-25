@@ -465,6 +465,9 @@
       var outtouch = false;
       canvas.addEventListener("pointerdown", (event) => {
         isPointerDown = true;
+        const rect = canvas.getBoundingClientRect();
+        mouseX = event.clientX - rect.left;
+        mouseY = event.clientY - rect.top;
         const pos = getCanvasCoord(event);
         outtouch = false;
         pointerdownpos = { x: pos.x, y: pos.y };
@@ -493,6 +496,9 @@
       });
       const pointerUpHandler = (event) => {
         const pos = getCanvasCoord(event);
+        const rect = canvas.getBoundingClientRect();
+        mouseX = event.clientX - rect.left;
+        mouseY = event.clientY - rect.top;
         for (var n of buttons) {
           if (n.show !== gamestate) continue;
           n.checkClick(pos.x, pos.y, pointerdownpos.x, pointerdownpos.y);
