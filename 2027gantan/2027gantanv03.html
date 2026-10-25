@@ -67,6 +67,13 @@
       //gamestate
       var gamestate = "title";
 
+      //images
+      const logoI = new Image();
+      logoI.src = "res/2027年賀状サムネイル.png";
+      logoI.onload = () => {
+            ctx.drawImage(logoI, (canvas.width  - logoI.width * canvas.height /100000) / 2, (canvas.height - logoI.height * canvas.height /10000) / 2 , logoI.width * canvas.height /10000 , logoI.height * canvas.height /10000);
+      };
+
       // -- particle --
       class touchParticle {
         constructor(x, y) {
@@ -344,6 +351,9 @@
         ctx.strokeStyle = "white";
         ctx.lineWidth = canvas.height / 25;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
+        if (true) {
+            ctx.drawImage(logoI, (canvas.width - logoI.width * canvas.height /2500) / 2, (canvas.height - logoI.height * canvas.height /2500) / 2 - canvas.height / 4, logoI.width * canvas.height /2500 , logoI.height * canvas.height /2500);
+        }
 
         //-- animations --
         for (var n of buttons) {
@@ -353,7 +363,6 @@
             n.update(deltaTime, "add", -0.06);
           }
         }
-
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
         dragParticles.forEach((p) => p.update(deltaTime));
