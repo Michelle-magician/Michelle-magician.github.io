@@ -64,14 +64,23 @@
       <!-- ----------------------------------------------------------------------- -->
       <!--                                 Classes                                 -->
       <!-- ----------------------------------------------------------------------- -->
+      let mouseX = 0;
+      let mouseY = 0;
       //gamestate
       var gamestate = "title";
 
       //images
       const logoI = new Image();
       logoI.src = "res/2027年賀状サムネイル.png";
+      var logoIsize = 1.0;
       logoI.onload = () => {
-            ctx.drawImage(logoI, (canvas.width  - logoI.width * canvas.height /100000) / 2, (canvas.height - logoI.height * canvas.height /10000) / 2 , logoI.width * canvas.height /10000 , logoI.height * canvas.height /10000);
+        ctx.drawImage(
+          logoI,
+          (canvas.width - (logoI.width * canvas.height) / 100000) / 2,
+          (canvas.height - (logoI.height * canvas.height) / 10000) / 2,
+          (logoI.width * canvas.height) / 10000,
+          (logoI.height * canvas.height) / 10000,
+        );
       };
 
       // -- particle --
@@ -352,7 +361,18 @@
         ctx.lineWidth = canvas.height / 25;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
         if (true) {
-            ctx.drawImage(logoI, (canvas.width - logoI.width * canvas.height /2500) / 2, (canvas.height - logoI.height * canvas.height /2500) / 2 - canvas.height / 4, logoI.width * canvas.height /2500 , logoI.height * canvas.height /2500);
+          ctx.drawImage(
+            logoI,
+            (canvas.width -
+              ((logoI.width * canvas.height) / 2500) * (1+((Math.sqrt(logoIsize))/5))) /
+              2,
+            (canvas.height -
+              ((logoI.height * canvas.height) / 2500) * (1+((logoIsize**2)/5))) /
+              2 -
+              canvas.height / 4,
+            ((logoI.width * canvas.height) / 2500) * (1+((Math.sqrt(logoIsize))/5)),
+            ((logoI.height * canvas.height) / 2500) * (1+((Math.sqrt(logoIsize))/5)),
+          );
         }
 
         //-- animations --
@@ -369,6 +389,32 @@
         dragParticles = dragParticles.filter((p) => p.life > 0);
         clickParticles.forEach((p) => p.update(deltaTime));
         clickParticles = clickParticles.filter((p) => p.life > 0);
+        if (gamestate === "title") {
+          
+            if (
+              mouseX >
+                (canvas.width - (logoI.width * canvas.height) / 2500) / 2 &&
+              mouseX <
+                (canvas.width - (logoI.width * canvas.height) / 2500) / 2 +
+                  (logoI.width * canvas.height) / 2500 &&
+              mouseY >
+                (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
+                  canvas.height / 4 &&
+              mouseY <
+                (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
+                  canvas.height / 4 +
+                  (logoI.height * canvas.height) / 2500
+            ) {
+              if (logoIsize < 1) {
+                logoIsize += 0.05;
+              }
+            } else {
+              logoIsize -= 0.025;
+              if (logoIsize < 0) {
+                logoIsize = 0;
+              }
+            }
+          }
 
         requestAnimationFrame(gameLoop);
       };
@@ -399,8 +445,12 @@
       });
       var frompos = { x: 0, y: 0 };
       canvas.addEventListener("pointermove", (event) => {
+        const pos = getCanvasCoord(event);
+        const rect = canvas.getBoundingClientRect();
+        mouseX = event.clientX - rect.left;
+        mouseY = event.clientY - rect.top;
+        //drag
         if (isPointerDown) {
-          const pos = getCanvasCoord(event);
           if (
             outtouch === true ||
             Math.hypot(pos.x - pointerdownpos.x, pos.y - pointerdownpos.y) >
