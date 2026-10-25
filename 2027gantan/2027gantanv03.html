@@ -418,29 +418,10 @@
         clickParticles = clickParticles.filter((p) => p.life > 0);
         //hover
         if (gamestate === "title") {
-          if (
-            mouseX >
-              (canvas.width - (logoI.width * canvas.height) / 2500) / 2 &&
-            mouseX <
-              (canvas.width - (logoI.width * canvas.height) / 2500) / 2 +
-                (logoI.width * canvas.height) / 2500 &&
-            mouseY >
-              (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
-                canvas.height / 4 &&
-            mouseY <
-              (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
-                canvas.height / 4 +
-                (logoI.height * canvas.height) / 2500
-          ) {
-            if (logoIsize < 1) {
-              logoIsize += 0.05;
-            }
-          } else {
-            logoIsize -= 0.025;
+          logoIsize -= 0.025;
             if (logoIsize < 0) {
               logoIsize = 0;
             }
-          }
         }
 
         requestAnimationFrame(gameLoop);
@@ -499,6 +480,25 @@
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
         mouseY = event.clientY - rect.top;
+        if (
+            mouseX >
+              (canvas.width - (logoI.width * canvas.height) / 2500) / 2 &&
+            mouseX <
+              (canvas.width - (logoI.width * canvas.height) / 2500) / 2 +
+                (logoI.width * canvas.height) / 2500 &&
+            mouseY >
+              (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
+                canvas.height / 4 &&
+            mouseY <
+              (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
+                canvas.height / 4 +
+                (logoI.height * canvas.height) / 2500
+          ) {
+            logoIsize += 0.5;
+            if (logoIsize > 1.2) {
+              logoIsize = 1.2;
+            }
+          }
         for (var n of buttons) {
           if (n.show !== gamestate) continue;
           n.checkClick(pos.x, pos.y, pointerdownpos.x, pointerdownpos.y);
