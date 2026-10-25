@@ -362,9 +362,8 @@
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
         if (true) {
           if (
-            ((logoI.width * canvas.height) / 2500) *
-              (1.1) <
-            canvas.width + canvas.height /900
+            ((logoI.width * canvas.height) / 2500) * 1.1 <
+            canvas.width + canvas.height / 900
           ) {
             ctx.drawImage(
               logoI,
@@ -386,7 +385,7 @@
             ctx.drawImage(
               logoI,
               (canvas.width -
-                (canvas.width*0.8 + canvas.height /900) *
+                (canvas.width * 0.8 + canvas.height / 900) *
                   (1 + Math.sqrt(logoIsize) / 5)) /
                 2,
               (canvas.height -
@@ -394,7 +393,7 @@
                   (1 + logoIsize ** 2 / 5)) /
                 2 -
                 canvas.height / 4,
-              (canvas.width*0.8 + canvas.height /900) *
+              (canvas.width * 0.8 + canvas.height / 900) *
                 (1 + Math.sqrt(logoIsize) / 5),
               ((logoI.height * canvas.height) / 2500) *
                 (1 + Math.sqrt(logoIsize) / 5),
@@ -419,9 +418,9 @@
         //hover
         if (gamestate === "title") {
           logoIsize -= 0.025;
-            if (logoIsize < 0) {
-              logoIsize = 0;
-            }
+          if (logoIsize < 0) {
+            logoIsize = 0;
+          }
         }
 
         requestAnimationFrame(gameLoop);
@@ -449,6 +448,24 @@
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
         mouseY = event.clientY - rect.top;
+        if (
+          mouseX > (canvas.width - (logoI.width * canvas.height) / 2500) / 2 &&
+          mouseX <
+            (canvas.width - (logoI.width * canvas.height) / 2500) / 2 +
+              (logoI.width * canvas.height) / 2500 &&
+          mouseY >
+            (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
+              canvas.height / 4 &&
+          mouseY <
+            (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
+              canvas.height / 4 +
+              (logoI.height * canvas.height) / 2500
+        ) {
+          logoIsize += 0.5;
+          if (logoIsize > 1.2) {
+            logoIsize = 1.2;
+          }
+        }
         const pos = getCanvasCoord(event);
         outtouch = false;
         pointerdownpos = { x: pos.x, y: pos.y };
@@ -480,25 +497,6 @@
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
         mouseY = event.clientY - rect.top;
-        if (
-            mouseX >
-              (canvas.width - (logoI.width * canvas.height) / 2500) / 2 &&
-            mouseX <
-              (canvas.width - (logoI.width * canvas.height) / 2500) / 2 +
-                (logoI.width * canvas.height) / 2500 &&
-            mouseY >
-              (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
-                canvas.height / 4 &&
-            mouseY <
-              (canvas.height - (logoI.height * canvas.height) / 2500) / 2 -
-                canvas.height / 4 +
-                (logoI.height * canvas.height) / 2500
-          ) {
-            logoIsize += 0.5;
-            if (logoIsize > 1.2) {
-              logoIsize = 1.2;
-            }
-          }
         for (var n of buttons) {
           if (n.show !== gamestate) continue;
           n.checkClick(pos.x, pos.y, pointerdownpos.x, pointerdownpos.y);
