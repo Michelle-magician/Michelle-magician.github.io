@@ -61,6 +61,16 @@
       window.addEventListener("load", resizeCanvas);
       window.addEventListener("resize", resizeCanvas);
 
+      <!-- -------------------------------- load --------------------------------- -->
+      async function loading() {
+        const Audiowidefont = new FontFace(
+          "audiowide",
+          "https://fonts.gstatic.com/s/audiowide/v22/l7gdbjpo0cum0ckerWCdlg_O.woff2",
+        );
+        await font.load(); // フォントがロードされるまで待つ
+        document.fonts.add(font); // FontFaceSetにFontFaceを追加
+      }
+      
       <!-- ----------------------------------------------------------------------- -->
       <!--                                 Classes                                 -->
       <!-- ----------------------------------------------------------------------- -->
@@ -73,6 +83,7 @@
       const logoI = new Image();
       logoI.src = "res/2027年賀状サムネイル.png";
       var logoIsize = 1.0;
+      var logoIsizeBstate = 1.0;
       logoI.onload = () => {
         ctx.drawImage(
           logoI,
@@ -267,13 +278,14 @@
       // -- UI --
       // Button
       class Button {
-        constructor(x, y, cont, show) {
+        constructor(x, y, cont, show, Bsize = 1.0) {
           this.x = x;
           this.y = y;
+          this.Bsize = Bsize;
           this.cont = cont;
           this.show = show;
           this.alpha = 1.0;
-          this.lsize = canvas.height;
+          this.lsize = canvas.height * this.Bsize;
         }
         update(deltaTime, op, value = 0, size = 1) {
           switch (op) {
@@ -289,7 +301,7 @@
               if (this.alpha < 0) this.alpha = 0;
               break;
           }
-          this.lsize = canvas.height * this.alpha ** 2;
+          this.lsize = canvas.height * this.alpha ** 2 * this.Bsize;
           ctx.fillStyle = "rgba(200,200,200," + this.alpha + ")";
           ctx.beginPath();
           ctx.roundRect(
@@ -331,7 +343,8 @@
       }
       var buttons = [
         new Button(0.5, 0.6, "start", "title"),
-        new Button(0.5, 0.75, "contact", "title"),
+        new Button(0.5, 0.72, "choose", "title"),
+        new Button(0.5, 0.85, "contact", "title", 0.8),
       ];
 
       <!-- ----------------------------------------------------------------------- -->
@@ -360,7 +373,7 @@
         ctx.strokeStyle = "white";
         ctx.lineWidth = canvas.height / 25;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
-        if (true) {
+        if (logoIsizeBstate > 0) {
           if (
             ((logoI.width * canvas.height) / 2500) * 1.1 <
             canvas.width + canvas.height / 900
@@ -369,17 +382,21 @@
               logoI,
               (canvas.width -
                 ((logoI.width * canvas.height) / 2500) *
-                  (1 + Math.sqrt(logoIsize) / 5)) /
+                  (1 + Math.sqrt(logoIsize) / 5) *
+                  Math.sqrt(logoIsizeBstate)) /
                 2,
               (canvas.height -
                 ((logoI.height * canvas.height) / 2500) *
-                  (1 + logoIsize ** 2 / 5)) /
+                  (1 + logoIsize ** 2 / 5) *
+                  Math.sqrt(logoIsizeBstate)) /
                 2 -
                 canvas.height / 4,
               ((logoI.width * canvas.height) / 2500) *
-                (1 + Math.sqrt(logoIsize) / 5),
+                (1 + Math.sqrt(logoIsize) / 5) *
+                Math.sqrt(logoIsizeBstate),
               ((logoI.height * canvas.height) / 2500) *
-                (1 + Math.sqrt(logoIsize) / 5),
+                (1 + Math.sqrt(logoIsize) / 5) *
+                Math.sqrt(logoIsizeBstate),
             );
           } else {
             ctx.drawImage(
@@ -420,6 +437,10 @@
           logoIsize -= 0.025;
           if (logoIsize < 0) {
             logoIsize = 0;
+          }
+        } else {
+          if (logoIsizeBstate > 0) {
+            logoIsizeBstate -= 0.05;
           }
         }
 
