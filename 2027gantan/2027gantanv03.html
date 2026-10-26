@@ -63,12 +63,17 @@
 
       <!-- -------------------------------- load --------------------------------- -->
       async function loading() {
-        const Audiowidefont = new FontFace(
+        const font = new FontFace(
           "audiowide",
-          "https://fonts.gstatic.com/s/audiowide/v22/l7gdbjpo0cum0ckerWCdlg_O.woff2",
+          "url(https://fonts.gstatic.com/s/audiowide/v22/l7gdbjpo0cum0ckerWCdlg_O.woff2)",
         );
-        await font.load(); // フォントがロードされるまで待つ
-        document.fonts.add(font); // FontFaceSetにFontFaceを追加
+        try {
+          const loadedFont = await font.load();
+          document.fonts.add(loadedFont);
+          console.log("Font loaded successfully.");
+        } catch (err) {
+          console.error("Font load failed:", err);
+        }
       }
       
       <!-- ----------------------------------------------------------------------- -->
@@ -278,9 +283,14 @@
       // -- UI --
       // Button
       class Button {
-        constructor(x, y, cont, show, Bsize = 1.0) {
+        constructor(x, y, cont, show, text = "", Bsize = 1.0) {
           this.x = x;
           this.y = y;
+          if(text ===""){
+            this.text = cont;
+          }else{
+            this.text = text;
+          }
           this.Bsize = Bsize;
           this.cont = cont;
           this.show = show;
@@ -324,6 +334,14 @@
           );
           ctx.stroke();
           ctx.closePath();
+          // フォントの設定
+          ctx.font = `${this.lsize / 15}px "audiowide"`;
+          // 水平方向の中央揃え
+          ctx.textAlign = 'center';
+          // 垂直方向の中央揃え
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = "white";
+          ctx.fillText('START', canvas.width/2, canvas.height/2);
         }
         checkClick(x, y, downX, downY) {
           if (
@@ -344,7 +362,7 @@
       var buttons = [
         new Button(0.5, 0.6, "start", "title"),
         new Button(0.5, 0.72, "choose", "title"),
-        new Button(0.5, 0.85, "contact", "title", 0.8),
+        new Button(0.5, 0.85, "contact", "title","", 0.8),
       ];
 
       <!-- ----------------------------------------------------------------------- -->
