@@ -188,10 +188,11 @@
           this.life = 1.0;
         }
         update(deltaTime) {
+          resetShadow();
           this.life -= 0.05 * deltaTime * 60;
           if (this.life < 0) this.life = 0;
           ctx.beginPath();
-          /*ctx.fillStyle = "rgba(255,255,255," + (this.life**2) + ")";
+          /*ctx.fillStyle = "rgba(230,230,230," + (this.life**2) + ")";
           ctx.arc(this.x, this.y, (canvas.height / 200), 0, Math.PI * 2);
           ctx.fill();*/
           ctx.moveTo(this.x, this.y);
@@ -200,6 +201,7 @@
           ctx.strokeStyle = "rgba(255,255,255," + this.life ** 2 + ")";
           ctx.stroke();
           ctx.closePath();
+          setShadow("rgba(0, 0, 0, 0.3)", 0, 0, canvas.height / 500);
         }
       }
       var dragParticles = [];
@@ -366,7 +368,6 @@
               break;
           }
           this.lsize = canvas.height * this.alpha ** 2 * this.Bsize;
-          setShadow("rgba(0, 0, 0, 0.3)", 0, 0, canvas.height / 500);
           ctx.fillStyle = "rgba(200,200,200," + this.alpha + ")";
           ctx.beginPath();
           ctx.roundRect(
@@ -460,6 +461,7 @@
       <!-- ----------------------------------------------------------------------- -->
       let lastTime = 0;
       const gameLoop = (timeStamp) => {
+        setShadow("rgba(0, 0, 0, 0.3)", 0, 0, canvas.height / 500);
         //-- 時間制御 準備 --
         if (!lastTime) lastTime = timeStamp; // 初回のみlastTimeを初期化
         let deltaTime = (timeStamp - lastTime) / 1000; // ms単位に変換
