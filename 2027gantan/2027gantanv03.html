@@ -296,6 +296,9 @@
           this.show = show;
           this.alpha = 1.0;
           this.lsize = canvas.height * this.Bsize;
+          if (this.show !== gamestate){
+                this.alpha = 0;
+          }
         }
         update(deltaTime, op, value = 0, size = 1) {
           switch (op) {
@@ -304,11 +307,11 @@
                 this.alpha = 0;
                 break;
               }
-              if (this.alpha >= 0 && this.alpha <= 1) {
+              if (this.alpha >= 0 && this.alpha <= 1.0) {
                 this.alpha += value * deltaTime * 60;
               }
-              if (this.alpha > 1) this.alpha = 1;
-              if (this.alpha < 0) this.alpha = 0;
+              if (this.alpha > 1.0) {this.alpha = 1.0;}
+              if (this.alpha < 0) {this.alpha = 0;}
               break;
           }
           this.lsize = canvas.height * this.alpha ** 2 * this.Bsize;
@@ -340,7 +343,7 @@
           ctx.textAlign = 'center';
           // 垂直方向の中央揃え
           ctx.textBaseline = 'middle';
-          ctx.fillStyle = "white";
+          ctx.fillStyle = `rgba(255,255,255,${this.alpha})`
           ctx.fillText(this.text, canvas.width/2, canvas.height * this.y + (canvas.height / 150) * (this.Bsize));
         }
         checkClick(x, y, downX, downY) {
@@ -363,6 +366,7 @@
         new Button(0.5, 0.6, "start", "title"),
         new Button(0.5, 0.72, "choose", "title"),
         new Button(0.5, 0.85, "contact", "title","", 0.8),
+        new Button(0.5, 0.9, "title", "contact","X", 0.8),
       ];
 
       <!-- ----------------------------------------------------------------------- -->
@@ -373,6 +377,7 @@
         //-- 時間制御 準備 --
         if (!lastTime) lastTime = timeStamp; // 初回のみlastTimeを初期化
         let deltaTime = (timeStamp - lastTime) / 1000; // ms単位に変換
+        if (isNaN(deltaTime) || deltaTime < 0) deltaTime = 0;
         lastTime = timeStamp;
 
         //-- 背景 --
@@ -435,11 +440,11 @@
             );
           }
         }
-
+        
         //-- animations --
         for (var n of buttons) {
-          if (n.show == gamestate) {
-            n.update(deltaTime, "", 0);
+          if (n.show === gamestate) {
+            n.update(deltaTime, "add", 0.06); 
           } else {
             n.update(deltaTime, "add", -0.06);
           }
@@ -452,6 +457,9 @@
         clickParticles = clickParticles.filter((p) => p.life > 0);
         //hover
         if (gamestate === "title") {
+          if (logoIsizeBstate < 1) {
+            logoIsizeBstate += 0.05;
+          }
           logoIsize -= 0.025;
           if (logoIsize < 0) {
             logoIsize = 0;
