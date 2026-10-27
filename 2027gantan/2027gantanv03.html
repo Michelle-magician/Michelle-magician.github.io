@@ -100,7 +100,7 @@
       };
 
       const JMlI = new Image();
-      JMlI.src = "res/_magician_logo-hqtf.png";
+      JMlI.src = "res/_magician_logo_tf.png";
       var JMlIsize = 1.0;
       var JMlIsizeBstate = 1.0;
       JMlI.onload = () => {
@@ -116,10 +116,10 @@
         if(gamestate === "contact"){
         ctx.drawImage(
           JMlI,
-          (canvas.width - ((JMlI.width * canvas.height) / 20000 * alpha)) / 2 ,
-          (canvas.height - ((JMlI.height * canvas.height) / 20000 * alpha)) / 2 ,
-          (JMlI.width * canvas.height) / 20000 * alpha,
-          (JMlI.height * canvas.height) / 20000 * alpha
+          (canvas.width - ((JMlI.width * canvas.height) / 5000 * alpha)) / 2 ,
+          (canvas.height - ((JMlI.height * canvas.height) / 5000 * alpha)) / 2 ,
+          (JMlI.width * canvas.height) / 5000 * alpha,
+          (JMlI.height * canvas.height) / 5000 * alpha
         )
         }
       }
