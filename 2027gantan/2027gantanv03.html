@@ -75,7 +75,7 @@
           console.error("Font load failed:", err);
         }
       }
-      
+
       <!-- ----------------------------------------------------------------------- -->
       <!--                                 Classes                                 -->
       <!-- ----------------------------------------------------------------------- -->
@@ -98,6 +98,31 @@
           (logoI.height * canvas.height) / 10000,
         );
       };
+
+      const JMlI = new Image();
+      JMlI.src = "res/_magician_logo-hqtf.png";
+      var JMlIsize = 1.0;
+      var JMlIsizeBstate = 1.0;
+      JMlI.onload = () => {
+        ctx.drawImage(
+          JMlI,
+          (canvas.width - (JMlI.width * canvas.height) / 100000) / 2,
+          (canvas.height - (JMlI.height * canvas.height) / 10000) / 2,
+          (JMlI.width * canvas.height) / 10000,
+          (JMlI.height * canvas.height) / 10000
+        );
+      }
+      const JMldraw = (alpha) =>{
+        if(gamestate === "contact"){
+        ctx.drawImage(
+          JMlI,
+          (canvas.width - ((JMlI.width * canvas.height) / 20000 * alpha)) / 2 ,
+          (canvas.height - ((JMlI.height * canvas.height) / 20000 * alpha)) / 2 ,
+          (JMlI.width * canvas.height) / 20000 * alpha,
+          (JMlI.height * canvas.height) / 20000 * alpha
+        )
+        }
+      }
 
       // -- particle --
       class touchParticle {
@@ -204,7 +229,7 @@
               ctx.fill();
               ctx.lineJoin = 'round';
               ctx.lineWidth = 1;
-              ctx.stroke(); 
+              ctx.stroke();
               ctx.lineJoin = 'miter';
               ctx.closePath();
               */
@@ -250,7 +275,7 @@
             //ctx.fillStyle="red"
             ctx.fillRect((this.x + dir.x * (canvas.height / 16) * (1 - this.life) **2), (this.y + dir.y * (canvas.height / 16) * (1 - this.life) **2), (canvas.height / 16) * (1 - this.life), (canvas.height / 16) * (1 - this.life));
 
-            
+
             const gradient = ctx.createLinearGradient(canvas.width / 2,0,canvas.width / 2,canvas.height,);
             gradient.addColorStop(0.21, "rgb(142,186,233)"); // 開始の色
             gradient.addColorStop(0.46, "rgb(255,247,253)"); // 中間の色
@@ -366,8 +391,35 @@
         new Button(0.5, 0.6, "start", "title"),
         new Button(0.5, 0.72, "choose", "title"),
         new Button(0.5, 0.85, "contact", "title","", 0.8),
-        new Button(0.5, 0.9, "title", "contact","X", 0.8),
+        new Button(0.5, 0.85, "title", "contact","X", 0.8),
       ];
+
+      // Box
+      class Box {
+        constructor(type = "normal",show, title = "title", content) {
+          this.type = type,
+          this.title = title,
+          this.content = content,
+          this.alpha = 1.0,
+          this.content = content
+          this.show = show
+        }
+        update(deltaTime, op, value = 0, size = 1) {
+          switch (op) {
+            case "add":
+              if (this.alpha >= 0 && this.alpha <= 1.0) {
+                this.alpha += value * deltaTime * 60;
+              }
+              if (this.alpha > 1.0) {this.alpha = 1.0;}
+              if (this.alpha < 0) {this.alpha = 0;}
+              break;
+          }
+          this.content(this.alpha);
+        }
+      }
+      var boxes = [
+        new Box("normal","contact","contact",JMldraw),
+      ]
 
       <!-- ----------------------------------------------------------------------- -->
       <!--                                gameloop                                 -->
@@ -440,15 +492,23 @@
             );
           }
         }
-        
-        //-- animations --
+
+        <!-- ----------------------------- animations ------------------------------ -->
         for (var n of buttons) {
           if (n.show === gamestate) {
-            n.update(deltaTime, "add", 0.06); 
+            n.update(deltaTime, "add", 0.06);
           } else {
             n.update(deltaTime, "add", -0.06);
           }
         }
+        for (var n of boxes) {
+          if (n.show === gamestate) {
+            n.update(deltaTime, "add", 0.06);
+          } else {
+            n.update(deltaTime, "add", -0.06);
+          }
+        }
+        // -- mouse animation --
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
         dragParticles.forEach((p) => p.update(deltaTime));
