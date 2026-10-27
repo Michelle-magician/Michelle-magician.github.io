@@ -84,6 +84,27 @@
       //gamestate
       var gamestate = "title";
 
+      // 💡 オブジェクトに影をつける共通関数
+      function setShadow(
+        color = "rgba(0, 0, 0, 0.5)",
+        blur = 10,
+        offsetX = 5,
+        offsetY = 5,
+      ) {
+        ctx.shadowColor = color; // 影の色 (rgbaがおすすめ)
+        ctx.shadowBlur = blur; // 影のぼかし（数値が大きいほど広がる）
+        ctx.shadowOffsetX = offsetX; // 横方向のズレ（右にプラス）
+        ctx.shadowOffsetY = offsetY; // 縦方向のズレ（下にプラス）
+      }
+
+      // 💡 影の設定をリセットする関数（これをしないと、その後の描画すべてに影がついてしまう）
+      function resetShadow() {
+        ctx.shadowColor = "transparent"; // 透明にする
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
+
       //images
       const logoI = new Image();
       logoI.src = "res/2027年賀状サムネイル.png";
@@ -109,20 +130,21 @@
           (canvas.width - (JMlI.width * canvas.height) / 100000) / 2,
           (canvas.height - (JMlI.height * canvas.height) / 10000) / 2,
           (JMlI.width * canvas.height) / 10000,
-          (JMlI.height * canvas.height) / 10000
+          (JMlI.height * canvas.height) / 10000,
         );
-      }
-      const JMldraw = (alpha) =>{
-        if(gamestate === "contact"){
-        ctx.drawImage(
-          JMlI,
-          (canvas.width - ((JMlI.width * canvas.height) / 5000 * alpha)) / 2 ,
-          (canvas.height - ((JMlI.height * canvas.height) / 5000 * alpha)) / 2 ,
-          (JMlI.width * canvas.height) / 5000 * alpha,
-          (JMlI.height * canvas.height) / 5000 * alpha
-        )
+      };
+      const JMldraw = (alpha) => {
+        if (gamestate === "contact") {
+          ctx.drawImage(
+            JMlI,
+            (canvas.width - ((JMlI.width * canvas.height) / 5000) * alpha) / 2,
+            (canvas.height - ((JMlI.height * canvas.height) / 5000) * alpha) /
+              2,
+            ((JMlI.width * canvas.height) / 5000) * alpha,
+            ((JMlI.height * canvas.height) / 5000) * alpha,
+          );
         }
-      }
+      };
 
       // -- particle --
       class touchParticle {
@@ -311,9 +333,9 @@
         constructor(x, y, cont, show, text = "", Bsize = 1.0) {
           this.x = x;
           this.y = y;
-          if(text ===""){
+          if (text === "") {
             this.text = cont;
-          }else{
+          } else {
             this.text = text;
           }
           this.Bsize = Bsize;
@@ -321,8 +343,8 @@
           this.show = show;
           this.alpha = 1.0;
           this.lsize = canvas.height * this.Bsize;
-          if (this.show !== gamestate){
-                this.alpha = 0;
+          if (this.show !== gamestate) {
+            this.alpha = 0;
           }
         }
         update(deltaTime, op, value = 0, size = 1) {
@@ -335,11 +357,16 @@
               if (this.alpha >= 0 && this.alpha <= 1.0) {
                 this.alpha += value * deltaTime * 60;
               }
-              if (this.alpha > 1.0) {this.alpha = 1.0;}
-              if (this.alpha < 0) {this.alpha = 0;}
+              if (this.alpha > 1.0) {
+                this.alpha = 1.0;
+              }
+              if (this.alpha < 0) {
+                this.alpha = 0;
+              }
               break;
           }
           this.lsize = canvas.height * this.alpha ** 2 * this.Bsize;
+          setShadow("rgba(0, 0, 0, 0.3)", 0, 0, canvas.height / 500);
           ctx.fillStyle = "rgba(200,200,200," + this.alpha + ")";
           ctx.beginPath();
           ctx.roundRect(
@@ -350,6 +377,7 @@
             this.lsize / 26,
           );
           ctx.fill();
+
           ctx.strokeStyle = "rgba(255,255,255," + this.alpha ** 2 + ")";
           ctx.lineWidth = canvas.height / 200;
           ctx.beginPath();
@@ -363,13 +391,17 @@
           ctx.stroke();
           ctx.closePath();
           // フォントの設定
-          ctx.font = `${this.lsize*this.Bsize / 13}px "audiowide"`;
+          ctx.font = `${(this.lsize * this.Bsize) / 13}px "audiowide"`;
           // 水平方向の中央揃え
-          ctx.textAlign = 'center';
+          ctx.textAlign = "center";
           // 垂直方向の中央揃え
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = `rgba(255,255,255,${this.alpha})`
-          ctx.fillText(this.text, canvas.width/2, canvas.height * this.y + (canvas.height / 150) * (this.Bsize));
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
+          ctx.fillText(
+            this.text,
+            canvas.width / 2,
+            canvas.height * this.y + (canvas.height / 150) * this.Bsize,
+          );
         }
         checkClick(x, y, downX, downY) {
           if (
@@ -390,19 +422,19 @@
       var buttons = [
         new Button(0.5, 0.6, "start", "title"),
         new Button(0.5, 0.72, "choose", "title"),
-        new Button(0.5, 0.85, "contact", "title","", 0.8),
-        new Button(0.5, 0.85, "title", "contact","X", 0.8),
+        new Button(0.5, 0.85, "contact", "title", "", 0.8),
+        new Button(0.5, 0.85, "title", "contact", "X", 0.8),
       ];
 
       // Box
       class Box {
-        constructor(type = "normal",show, title = "title", content) {
-          this.type = type,
-          this.title = title,
-          this.content = content,
-          this.alpha = 1.0,
-          this.content = content
-          this.show = show
+        constructor(type = "normal", show, title = "title", content) {
+          ((this.type = type),
+            (this.title = title),
+            (this.content = content),
+            (this.alpha = 1.0),
+            (this.content = content));
+          this.show = show;
         }
         update(deltaTime, op, value = 0, size = 1) {
           switch (op) {
@@ -410,16 +442,18 @@
               if (this.alpha >= 0 && this.alpha <= 1.0) {
                 this.alpha += value * deltaTime * 60;
               }
-              if (this.alpha > 1.0) {this.alpha = 1.0;}
-              if (this.alpha < 0) {this.alpha = 0;}
+              if (this.alpha > 1.0) {
+                this.alpha = 1.0;
+              }
+              if (this.alpha < 0) {
+                this.alpha = 0;
+              }
               break;
           }
           this.content(this.alpha);
         }
       }
-      var boxes = [
-        new Box("normal","contact","contact",JMldraw),
-      ]
+      var boxes = [new Box("normal", "contact", "contact", JMldraw)];
 
       <!-- ----------------------------------------------------------------------- -->
       <!--                                gameloop                                 -->
