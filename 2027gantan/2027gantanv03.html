@@ -335,13 +335,13 @@
           ctx.stroke();
           ctx.closePath();
           // フォントの設定
-          ctx.font = `${this.lsize / 15}px "audiowide"`;
+          ctx.font = `${this.lsize*this.Bsize / 13}px "audiowide"`;
           // 水平方向の中央揃え
           ctx.textAlign = 'center';
           // 垂直方向の中央揃え
           ctx.textBaseline = 'middle';
           ctx.fillStyle = "white";
-          ctx.fillText('START', canvas.width/2, canvas.height/2);
+          ctx.fillText(this.text, canvas.width/2, canvas.height * this.y + (canvas.height / 150) * (this.Bsize));
         }
         checkClick(x, y, downX, downY) {
           if (
@@ -548,6 +548,10 @@
       window.addEventListener("pointerup", pointerUpHandler);
       window.addEventListener("pointercancel", () => {
         isPointerDown = false;
+      });
+      window.addEventListener("load", () => {
+        loading();
+        resizeCanvas();
       });
 
       gameLoop();
