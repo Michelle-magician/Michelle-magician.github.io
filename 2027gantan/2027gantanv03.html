@@ -509,7 +509,7 @@
         for (const obj of renderobjects){
           const [type,x,y,w,as,angle,resource] = obj;
           if (!resource || !resource.complete) continue;
-          ctx.save;
+          ctx.save();
           ctx.translate(x,y);
           if (angle !== 0){
             ctx.rotate(angle * Math.PI /180);
