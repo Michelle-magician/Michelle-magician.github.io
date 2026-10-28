@@ -554,15 +554,15 @@
         //hover
         if (gamestate === "title") {
           if (logoIsizeBstate < 1) {
-            logoIsizeBstate += 0.05;
+            logoIsizeBstate += 150*deltaTime/60;
           }
-          logoIsize -= 0.025;
+          logoIsize -= 10*deltaTime/60;
           if (logoIsize < 0) {
             logoIsize = 0;
           }
         } else {
           if (logoIsizeBstate > 0) {
-            logoIsizeBstate -= 0.05;
+            logoIsizeBstate -= 150*deltaTime/60;
           }
         }
 
