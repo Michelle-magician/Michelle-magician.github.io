@@ -81,6 +81,12 @@
       <!-- ----------------------------------------------------------------------- -->
       let mouseX = 0;
       let mouseY = 0;
+      const camera = {
+        x: 0,
+        y: 0,
+        zoom:1.0
+      }
+
       //gamestate
       var gamestate = "title";
 
@@ -107,7 +113,7 @@
 
       //images
       const logoI = new Image();
-      logoI.src = "res/2027年賀状サムネイル.png";
+      logoI.src = "res/2027nenga_logo.png";
       var logoIsize = 1.0;
       var logoIsizeBstate = 1.0;
       logoI.onload = () => {
@@ -145,6 +151,12 @@
           );
         }
       };
+
+      const sheepI = new Image();
+      sheepI.src = "res/2027nenga_sheep.png";
+
+      const sheepinI = new Image();
+      sheepinI.src = "res/2027nenga_sheep_inside.png";
 
       // -- particle --
       class touchParticle {
@@ -369,7 +381,7 @@
           if(this.r < canvas.height * 0.02){
             this.r = canvas.height *0.02
           }
-          ctx.fillStyle = "rgba(230,230,230," + ( this.alpha /2 ) + ")";
+          ctx.fillStyle = "rgba(255,255,255," + ( this.alpha /2 ) + ")";
           ctx.beginPath;
           console.log(this.x,this.y,this.w,this.h,this.r);
           ctx.roundRect(
@@ -483,6 +495,32 @@
         new Button(0.5, 0.85, "title", "contact", "X", 0.8),
       ];
 
+      // -- main objects --
+      const renderobjects = [
+        ["img",0,0,500,1.0,0,sheepI],
+        ["img",0,0,500,1.0,0,sheepinI]
+      ]
+
+      function drawCameraScene(){
+        ctx.save();
+        ctx.translate(canvas.width /2, canvas.height /2);
+        ctx.scale(camera.zoom,camera.zoom);
+        ctx.translate(-camera.x,-camera.y);
+        for (const obj of renderobjects){
+          const [type,x,y,w,as,angle,resource] = obj;
+          if (!resource || !resource.complete) continue;
+          ctx.save;
+          ctx.translate(x,y);
+          if (angle !== 0){
+            ctx.rotate(angle * Math.PI /180);
+          }
+          
+          ctx.drawImage(resource, -w/2, -(w * resource.height /resource.width*as)/2, w, (w * resource.height /resource.width*as));
+
+          ctx.restore();
+        }
+        ctx.restore();
+      }
       
       <!-- ----------------------------------------------------------------------- -->
       <!--                                gameloop                                 -->
@@ -556,6 +594,8 @@
             );
           }
         }
+
+        drawCameraScene();
 
         <!-- ----------------------------- animations ------------------------------ -->
         for (var n of boxes) {
