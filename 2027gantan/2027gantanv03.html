@@ -84,7 +84,7 @@
       //gamestate
       var gamestate = "title";
 
-      // 💡 オブジェクトに影をつける共通関数
+      // 影
       function setShadow(
         color = "rgba(0, 0, 0, 0.5)",
         blur = 10,
@@ -97,7 +97,7 @@
         ctx.shadowOffsetY = offsetY; // 縦方向のズレ（下にプラス）
       }
 
-      // 💡 影の設定をリセットする関数（これをしないと、その後の描画すべてに影がついてしまう）
+      // 影リセット
       function resetShadow() {
         ctx.shadowColor = "transparent"; // 透明にする
         ctx.shadowBlur = 0;
@@ -330,6 +330,62 @@
       var clickParticles = [];
 
       // -- UI --
+      // Box
+      class Box {
+        constructor(type = "normal", show, title = "title", content) {
+          this.type = type,
+          this.title = title
+          this.content = content
+          this.alpha = 0.0
+          this.show = show;
+          this.x = 0.0
+          this.y = 0.0
+          this.w = canvas.width
+          this.h = canvas.height
+        }
+        update(deltaTime, op, value = 0, size = 1) {
+          switch (op) {
+            case "add":
+              if (this.alpha >= 0 && this.alpha <= 1.0) {
+                this.alpha += value * deltaTime * 60;
+              }
+              if (this.alpha > 1.0) {
+                this.alpha = 1.0;
+              }
+              if (this.alpha < 0) {
+                this.alpha = 0;
+              }
+              break;
+          }
+          switch (this.type){
+            case "normal":
+              this.x = canvas.height * 0.05 + ( ( canvas.width - canvas.height * 0.1 ) /2 ) * (1 - this.alpha)
+              this.y = canvas.height * 0.05 + ( canvas.height * 0.9 /2 )*(1 - this.alpha)
+              this.w = ( canvas.width - canvas.height * 0.1 ) * this.alpha
+              this.h = ( canvas.height * 0.9 ) * this.alpha
+              break;
+          }
+          this.r = canvas.height * 0.02 - this.x
+          if(this.r < canvas.height * 0.02){
+            this.r = canvas.height *0.02
+          }
+          ctx.fillStyle = "rgba(230,230,230," + ( this.alpha /2 ) + ")";
+          ctx.beginPath;
+          console.log(this.x,this.y,this.w,this.h,this.r);
+          ctx.roundRect(
+            this.x,
+            this.y,
+            this.w,
+            this.h,
+            this.r,
+          );
+          ctx.fill();
+          ctx.closePath;
+          this.content(this.alpha);
+        }
+      }
+      var boxes = [new Box("normal", "contact", "contact", JMldraw)];
+      
       // Button
       class Button {
         constructor(x, y, cont, show, text = "", Bsize = 1.0) {
@@ -427,35 +483,7 @@
         new Button(0.5, 0.85, "title", "contact", "X", 0.8),
       ];
 
-      // Box
-      class Box {
-        constructor(type = "normal", show, title = "title", content) {
-          ((this.type = type),
-            (this.title = title),
-            (this.content = content),
-            (this.alpha = 1.0),
-            (this.content = content));
-          this.show = show;
-        }
-        update(deltaTime, op, value = 0, size = 1) {
-          switch (op) {
-            case "add":
-              if (this.alpha >= 0 && this.alpha <= 1.0) {
-                this.alpha += value * deltaTime * 60;
-              }
-              if (this.alpha > 1.0) {
-                this.alpha = 1.0;
-              }
-              if (this.alpha < 0) {
-                this.alpha = 0;
-              }
-              break;
-          }
-          this.content(this.alpha);
-        }
-      }
-      var boxes = [new Box("normal", "contact", "contact", JMldraw)];
-
+      
       <!-- ----------------------------------------------------------------------- -->
       <!--                                gameloop                                 -->
       <!-- ----------------------------------------------------------------------- -->
@@ -530,13 +558,6 @@
         }
 
         <!-- ----------------------------- animations ------------------------------ -->
-        for (var n of buttons) {
-          if (n.show === gamestate) {
-            n.update(deltaTime, "add", 0.06);
-          } else {
-            n.update(deltaTime, "add", -0.06);
-          }
-        }
         for (var n of boxes) {
           if (n.show === gamestate) {
             n.update(deltaTime, "add", 0.06);
@@ -544,6 +565,14 @@
             n.update(deltaTime, "add", -0.06);
           }
         }
+        for (var n of buttons) {
+          if (n.show === gamestate) {
+            n.update(deltaTime, "add", 0.06);
+          } else {
+            n.update(deltaTime, "add", -0.06);
+          }
+        }
+        
         // -- mouse animation --
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
@@ -556,7 +585,7 @@
           if (logoIsizeBstate < 1) {
             logoIsizeBstate += 150*deltaTime/60;
           }
-          logoIsize -= 10*deltaTime/60;
+          logoIsize -= 150*deltaTime/60;
           if (logoIsize < 0) {
             logoIsize = 0;
           }
