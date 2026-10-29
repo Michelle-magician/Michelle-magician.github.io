@@ -1,0 +1,29 @@
+/**
+ * 画像の白を特定の色に変えた、新しい描画ソース（Canvas要素）をメモリ上に生成する
+ */
+function createColorChangedSource(img, targetColor = { r: 255, g: 0, b: 0 }, tolerance = 15) {
+    // 1. メモリ上だけに非表示のテンポラリCanvasを作成
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // 画像のオリジナルサイズに設定
+    tempCanvas.width = img.naturalWidth || img.width;
+    tempCanvas.height = img.naturalHeight || img.height;
+    
+    // 2. いったん描画してピクセルデータを書き換える
+    tempCtx.drawImage(img, 0, 0);
+    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+    const data = imageData.data;
+    
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i] >= 255 - tolerance && data[i + 1] >= 255 - tolerance && data[i + 2] >= 255 - tolerance) {
+            data[i]     = targetColor.r;
+            data[i + 1] = targetColor.g;
+            data[i + 2] = targetColor.b;
+        }
+    }
+    tempCtx.putImageData(imageData, 0, 0);
+    
+    // 色変更済みのCanvas（Imageソースとしてそのまま使える）を返す
+    return tempCanvas;
+}

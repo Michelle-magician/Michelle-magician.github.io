@@ -81,7 +81,7 @@
       <!-- ----------------------------------------------------------------------- -->
       let mouseX = 0;
       let mouseY = 0;
-      const camera = {
+      let camera = {
         x: 0,
         y: 0,
         zoom:1.0
@@ -112,6 +112,28 @@
       }
 
       //images
+      function changecolor(img,color = {r:0,g:0,b:0}){
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+
+        tempCanvas.width = img.naturalWidth || img.width;
+        tempCanvas.height = img.naturalHeight || img.height;
+
+        tempCtx.drawImage(img,0,0);
+        const imageData = tempCtx.getImageData(0,0,tempCanvas.width,tempCanvas.height);
+        const data = imageData.data;
+
+        for (let i = 0; i<data.length; i +=4 ){
+          if (data[i] >= 255 && data[i + 1] >= 255 && data[i+2] >= 255){
+            data[i]   = color.r;
+            data[i+1] = color.g;
+            data[i+2] = color.b;
+          }
+        }
+        tempCtx.putImageData(imageData,0,0);
+        return tempCanvas;
+      }
+
       const logoI = new Image();
       logoI.src = "res/2027nenga_logo.png";
       var logoIsize = 1.0;
@@ -155,8 +177,6 @@
       const sheepI = new Image();
       sheepI.src = "res/2027nenga_sheep.png";
 
-      const sheepinI = new Image();
-      sheepinI.src = "res/2027nenga_sheep_inside.png";
 
       // -- particle --
       class touchParticle {
@@ -497,8 +517,7 @@
 
       // -- main objects --
       const renderobjects = [
-        ["img",0,0,500,1.0,0,sheepI],
-        ["img",0,0,500,1.0,0,sheepinI]
+        ["ccimg",0,0,250,1.0,0,sheepI,{r:50,g:255,b:250}],
       ]
 
       function drawCameraScene(){
@@ -507,7 +526,7 @@
         ctx.scale(camera.zoom,camera.zoom);
         ctx.translate(-camera.x,-camera.y);
         for (const obj of renderobjects){
-          const [type,x,y,w,as,angle,resource] = obj;
+          const [type,x,y,w,as,angle,resource,{r:r,g:g,b:b}] = obj;
           if (!resource || !resource.complete) continue;
           ctx.save();
           ctx.translate(x,y);
@@ -515,7 +534,7 @@
             ctx.rotate(angle * Math.PI /180);
           }
           
-          ctx.drawImage(resource, -w/2, -(w * resource.height /resource.width*as)/2, w, (w * resource.height /resource.width*as));
+          ctx.drawImage(changecolor(resource,{r:r,g:g,b:b},), -w/2, -(w * resource.height /resource.width*as)/2, w, (w * resource.height /resource.width*as));
 
           ctx.restore();
         }
@@ -527,6 +546,8 @@
       <!-- ----------------------------------------------------------------------- -->
       let lastTime = 0;
       const gameLoop = (timeStamp) => {
+        camera = {x:-canvas.width/2 + mouseX,y:-canvas.height/2 + mouseY,zoom:Math.abs(mouseX-canvas.width/2)/100}
+
         setShadow("rgba(0, 0, 0, 0.3)", 0, 0, canvas.height / 500);
         //-- 時間制御 準備 --
         if (!lastTime) lastTime = timeStamp; // 初回のみlastTimeを初期化
