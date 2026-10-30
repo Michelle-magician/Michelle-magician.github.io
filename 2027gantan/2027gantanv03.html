@@ -84,8 +84,8 @@
       let camera = {
         x: 0,
         y: 0,
-        zoom:1.0
-      }
+        zoom: 1.0,
+      };
 
       //gamestate
       var gamestate = "title";
@@ -112,25 +112,30 @@
       }
 
       //images
-      function changecolor(img,color = {r:0,g:0,b:0}){
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
+      function changecolor(img, color = { r: 0, g: 0, b: 0 }) {
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
 
         tempCanvas.width = img.naturalWidth || img.width;
         tempCanvas.height = img.naturalHeight || img.height;
 
-        tempCtx.drawImage(img,0,0);
-        const imageData = tempCtx.getImageData(0,0,tempCanvas.width,tempCanvas.height);
+        tempCtx.drawImage(img, 0, 0);
+        const imageData = tempCtx.getImageData(
+          0,
+          0,
+          tempCanvas.width,
+          tempCanvas.height,
+        );
         const data = imageData.data;
 
-        for (let i = 0; i<data.length; i +=4 ){
-          if (data[i] >= 255 && data[i + 1] >= 255 && data[i+2] >= 255){
-            data[i]   = color.r;
-            data[i+1] = color.g;
-            data[i+2] = color.b;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i] >= 255 && data[i + 1] >= 255 && data[i + 2] >= 255) {
+            data[i] = color.r;
+            data[i + 1] = color.g;
+            data[i + 2] = color.b;
           }
         }
-        tempCtx.putImageData(imageData,0,0);
+        tempCtx.putImageData(imageData, 0, 0);
         return tempCanvas;
       }
 
@@ -176,7 +181,6 @@
 
       const sheepI = new Image();
       sheepI.src = "res/2027nenga_sheep.png";
-
 
       // -- particle --
       class touchParticle {
@@ -365,15 +369,14 @@
       // Box
       class Box {
         constructor(type = "normal", show, title = "title", content) {
-          this.type = type,
-          this.title = title
-          this.content = content
-          this.alpha = 0.0
+          ((this.type = type), (this.title = title));
+          this.content = content;
+          this.alpha = 0.0;
           this.show = show;
-          this.x = 0.0
-          this.y = 0.0
-          this.w = canvas.width
-          this.h = canvas.height
+          this.x = 0.0;
+          this.y = 0.0;
+          this.w = canvas.width;
+          this.h = canvas.height;
         }
         update(deltaTime, op, value = 0, size = 1) {
           switch (op) {
@@ -389,35 +392,32 @@
               }
               break;
           }
-          switch (this.type){
+          switch (this.type) {
             case "normal":
-              this.x = canvas.height * 0.05 + ( ( canvas.width - canvas.height * 0.1 ) /2 ) * (1 - this.alpha)
-              this.y = canvas.height * 0.05 + ( canvas.height * 0.9 /2 )*(1 - this.alpha)
-              this.w = ( canvas.width - canvas.height * 0.1 ) * this.alpha
-              this.h = ( canvas.height * 0.9 ) * this.alpha
+              this.x =
+                canvas.height * 0.05 +
+                ((canvas.width - canvas.height * 0.1) / 2) * (1 - this.alpha);
+              this.y =
+                canvas.height * 0.05 +
+                ((canvas.height * 0.9) / 2) * (1 - this.alpha);
+              this.w = (canvas.width - canvas.height * 0.1) * this.alpha;
+              this.h = canvas.height * 0.9 * this.alpha;
               break;
           }
-          this.r = canvas.height * 0.02 - this.x
-          if(this.r < canvas.height * 0.02){
-            this.r = canvas.height *0.02
+          this.r = canvas.height * 0.02 - this.x;
+          if (this.r < canvas.height * 0.02) {
+            this.r = canvas.height * 0.02;
           }
-          ctx.fillStyle = "rgba(255,255,255," + ( this.alpha /2 ) + ")";
+          ctx.fillStyle = "rgba(255,255,255," + this.alpha / 2 + ")";
           ctx.beginPath;
-          console.log(this.x,this.y,this.w,this.h,this.r);
-          ctx.roundRect(
-            this.x,
-            this.y,
-            this.w,
-            this.h,
-            this.r,
-          );
+          ctx.roundRect(this.x, this.y, this.w, this.h, this.r);
           ctx.fill();
           ctx.closePath;
           this.content(this.alpha);
         }
       }
       var boxes = [new Box("normal", "contact", "contact", JMldraw)];
-      
+
       // Button
       class Button {
         constructor(x, y, cont, show, text = "", Bsize = 1.0) {
@@ -515,38 +515,62 @@
         new Button(0.5, 0.85, "title", "contact", "X", 0.8),
       ];
 
-      // -- main objects --
-      const renderobjects = [
-        ["ccimg",0,0,250,1.0,0,sheepI,{r:50,g:255,b:250}],
-      ]
+      <!-- ---------------------------- main objects ----------------------------- -->
 
-      function drawCameraScene(){
+      const renderobjects = [
+        ["ccimg", 0, 0, 250, 0.0, 0, sheepI, { r: 50, g: 255, b: 250 }],
+        ["rr", 0, 0, 250, 230, 0.0, 0, { r: 20, g: 23, b: 23 }]
+      ];
+
+      function drawCameraScene() {
         ctx.save();
-        ctx.translate(canvas.width /2, canvas.height /2);
-        ctx.scale(camera.zoom,camera.zoom);
-        ctx.translate(-camera.x,-camera.y);
-        for (const obj of renderobjects){
-          const [type,x,y,w,as,angle,resource,{r:r,g:g,b:b}] = obj;
-          if (!resource || !resource.complete) continue;
-          ctx.save();
-          ctx.translate(x,y);
-          if (angle !== 0){
-            ctx.rotate(angle * Math.PI /180);
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(camera.zoom, camera.zoom);
+        ctx.translate(-camera.x, -camera.y);
+        for (const obj of renderobjects) {
+          const [type, x, y, w, h, angle, resource, { r: r, g: g, b: b }] = obj;
+          if(type ==="ccimg"){
+            if (!resource || !resource.complete) continue;
           }
-          
-          ctx.drawImage(changecolor(resource,{r:r,g:g,b:b},), -w/2, -(w * resource.height /resource.width*as)/2, w, (w * resource.height /resource.width*as));
+          ctx.save();
+          ctx.translate(x, y);
+          if (angle !== 0) {
+            ctx.rotate((angle * Math.PI) / 180);
+          }
+
+          switch (type) {
+            case "ccimg":
+              ctx.drawImage(
+                changecolor(resource, { r: r, g: g, b: b }),
+                -w / 2,
+                -(((w * resource.height) / resource.width) * h) / 2,
+                w,
+                ((w * resource.height) / resource.width) * h,
+              );
+              break;
+            case "img":
+              break;
+            case "rr":
+              ctx.beginPath();
+              ctx.fillStyle = "white";
+              ctx.roundRect(-w / 2, -h / 2, w, h, 0.0);
+              ctx.fill();
+              ctx.closePath();
+              break;
+          }
 
           ctx.restore();
         }
         ctx.restore();
       }
-      
+
       <!-- ----------------------------------------------------------------------- -->
       <!--                                gameloop                                 -->
       <!-- ----------------------------------------------------------------------- -->
       let lastTime = 0;
       const gameLoop = (timeStamp) => {
-        camera = {x:-canvas.width/2 + mouseX,y:-canvas.height/2 + mouseY,zoom:Math.abs(mouseX-canvas.width/2)/100}
+        camera.x = -canvas.width / 2 + mouseX;
+        camera.y = -canvas.height / 2 + mouseY;
 
         setShadow("rgba(0, 0, 0, 0.3)", 0, 0, canvas.height / 500);
         //-- 時間制御 準備 --
@@ -633,7 +657,7 @@
             n.update(deltaTime, "add", -0.06);
           }
         }
-        
+
         // -- mouse animation --
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
@@ -644,15 +668,15 @@
         //hover
         if (gamestate === "title") {
           if (logoIsizeBstate < 1) {
-            logoIsizeBstate += 150*deltaTime/60;
+            logoIsizeBstate += (150 * deltaTime) / 60;
           }
-          logoIsize -= 150*deltaTime/60;
+          logoIsize -= (150 * deltaTime) / 60;
           if (logoIsize < 0) {
             logoIsize = 0;
           }
         } else {
           if (logoIsizeBstate > 0) {
-            logoIsizeBstate -= 150*deltaTime/60;
+            logoIsizeBstate -= (150 * deltaTime) / 60;
           }
         }
 
@@ -677,6 +701,7 @@
       };
       var outtouch = false;
       canvas.addEventListener("pointerdown", (event) => {
+        camera.zoom = 2.0;
         isPointerDown = true;
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
@@ -726,6 +751,7 @@
         }
       });
       const pointerUpHandler = (event) => {
+        camera.zoom = 1.0;
         const pos = getCanvasCoord(event);
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
