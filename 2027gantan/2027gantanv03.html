@@ -140,7 +140,7 @@
       }
 
       const logoI = new Image();
-      logoI.src = "res/2027nenga_logo.png";
+      logoI.src = "res/2027nenga_logo_.png";
       var logoIsize = 1.0;
       var logoIsizeBstate = 1.0;
       logoI.onload = () => {
@@ -518,8 +518,8 @@
       <!-- ---------------------------- main objects ----------------------------- -->
 
       const renderobjects = [
-        ["ccimg", 0, 0, 250, 1.0, 0, sheepI, { r: 50, g: 255, b: 250 }],
-        ["rr", 250, 0, 240, 230, 0.0, 0, { r: 20, g: 23, b: 23 }]
+        ["rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23 }],
+        ["ccimg", 30, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250 }],
       ];
 
       function drawCameraScene() {
@@ -528,12 +528,13 @@
         ctx.scale(camera.zoom, camera.zoom);
         ctx.translate(-camera.x, -camera.y);
         for (const obj of renderobjects) {
-          const [type, x, y, w, h, angle, resource, { r: r, g: g, b: b }] = obj;
-          if(type ==="ccimg"){
+          const [type, x, y, w, h, angle, z, resource, { r: r, g: g, b: b }] =
+            obj;
+          if (type === "ccimg") {
             if (!resource || !resource.complete) continue;
           }
           ctx.save();
-          ctx.translate(x, y);
+          ctx.translate(camera.x * (1 - z) + x, camera.y * (1 - z) + y);
           if (angle !== 0) {
             ctx.rotate((angle * Math.PI) / 180);
           }
@@ -565,8 +566,7 @@
       }
 
       <!-- ------------------------------- easings ------------------------------- -->
-      const al_fl = (alpha) =>4*(alpha-0.5)**3+0.5
-
+      const al_fl = (alpha) => 4 * (alpha - 0.5) ** 3 + 0.5;
 
       <!-- ----------------------------------------------------------------------- -->
       <!--                                gameloop                                 -->
@@ -683,6 +683,19 @@
             logoIsizeBstate -= (150 * deltaTime) / 60;
           }
         }
+        if (gamestate == "start") {
+          if (isPointerDown == true) {
+            camera.zoom += 0.1;
+            if (camera.zoom > 2.0) {
+              camera.zoom = 2.0;
+            }
+          } else {
+            camera.zoom -= 0.1;
+            if (camera.zoom < 1.0) {
+              camera.zoom = 1.0;
+            }
+          }
+        }
 
         requestAnimationFrame(gameLoop);
       };
@@ -705,7 +718,6 @@
       };
       var outtouch = false;
       canvas.addEventListener("pointerdown", (event) => {
-        camera.zoom = 2.0;
         isPointerDown = true;
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
@@ -755,7 +767,6 @@
         }
       });
       const pointerUpHandler = (event) => {
-        camera.zoom = 1.0;
         const pos = getCanvasCoord(event);
         const rect = canvas.getBoundingClientRect();
         mouseX = event.clientX - rect.left;
