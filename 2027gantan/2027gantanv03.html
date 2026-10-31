@@ -112,7 +112,7 @@
       }
 
       //images
-      function changecolor(img, color = { r: 0, g: 0, b: 0 }) {
+      function changecolor(img, color = { r: 0, g: 0, b: 0, a: 0 }) {
         const tempCanvas = document.createElement("canvas");
         const tempCtx = tempCanvas.getContext("2d");
 
@@ -133,6 +133,7 @@
             data[i] = color.r;
             data[i + 1] = color.g;
             data[i + 2] = color.b;
+            data[i + 3] = color.a;
           }
         }
         tempCtx.putImageData(imageData, 0, 0);
@@ -527,8 +528,8 @@
           angle,
           z,
           resource,
-          { r, g, b },
-          { sr, sg, sb },
+          { r, g, b, a },
+          { sr, sg, sb, sa },
         ) {
           this.type = type;
           this.x = x;
@@ -538,45 +539,18 @@
           this.angle = angle;
           this.z = z;
           this.resource = resource;
-          this.color = { r, g, b };
-          this.scolor = { sr, sg, sb };
+          this.color = { r, g, b, a };
+          this.scolor = { sr, sg, sb, sa };
           this.time = 1.0;
           this.easing = "";
           this.v = 1.0;
-          this.animation = [x, y, w, h, angle, z, { r, g, b }, { sr, sg, sb }];
+          this.animation = [x, y, w, h, angle, z, { r, g, b, a }, { sr, sg, sb, sa }];
         }
         drawCameraScene(Deltatime) {
           ctx.save();
           ctx.translate(canvas.width / 2, canvas.height / 2);
           ctx.scale(camera.zoom, camera.zoom);
           ctx.translate(-camera.x, -camera.y);
-            /*const [
-              type,
-              x,
-              y,
-              w,
-              h,
-              angle,
-              z,
-              resource,
-              { r: r, g: g, b: b },
-              { sr: sr, sg: sb, sb: sg },
-            ] = obj;
-            const [
-              time,
-              easing,
-              v,
-              [
-                tox,
-                toy,
-                tow,
-                toh,
-                toangle,
-                toz,
-                { tor, rog, rob },
-                { tosr, tosg, tosb },
-              ],
-            ] = toobj;*/
             if (this.type === "ccimg" && (!this.resource || !this.resource.complete)) {
               ctx.restore();
               return;
@@ -611,8 +585,8 @@
       }
 
       const renderobjects = [
-        new RenderObject("rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23 }, {sr:0,sg:0,sb:0}),
-        new RenderObject("ccimg", 30, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250 },{sr:0,sg:0,sb:0}),
+        plane1 = new RenderObject("rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23, a:255 }, {sr:0,sg:0,sb:0}),
+        sheep = new RenderObject("ccimg", 30, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250, a:255 },{sr:0,sg:0,sb:0}),
       ];
 
       <!-- ------------------------------- easings ------------------------------- -->
@@ -715,7 +689,7 @@
           }
         }
 
-        // -- mouse animation --
+        <!-- --------------------------- mouse animation --------------------------- -->
         touchParticles.forEach((p) => p.update(deltaTime));
         touchParticles = touchParticles.filter((p) => p.life > 0);
         dragParticles.forEach((p) => p.update(deltaTime));
@@ -736,6 +710,7 @@
             logoIsizeBstate -= (150 * deltaTime) / 60;
           }
         }
+
         if (gamestate == "start") {
           if (isPointerDown == true) {
             camera.zoom += 0.1;
