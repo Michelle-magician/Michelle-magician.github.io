@@ -517,53 +517,103 @@
 
       <!-- ---------------------------- main objects ----------------------------- -->
 
-      const renderobjects = [
-        ["rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23 }],
-        ["ccimg", 30, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250 }],
-      ];
-
-      function drawCameraScene() {
-        ctx.save();
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.scale(camera.zoom, camera.zoom);
-        ctx.translate(-camera.x, -camera.y);
-        for (const obj of renderobjects) {
-          const [type, x, y, w, h, angle, z, resource, { r: r, g: g, b: b }] =
-            obj;
-          if (type === "ccimg") {
-            if (!resource || !resource.complete) continue;
-          }
+      class RenderObject {
+        constructor(
+          type,
+          x,
+          y,
+          w,
+          h,
+          angle,
+          z,
+          resource,
+          { r, g, b },
+          { sr, sg, sb },
+        ) {
+          this.type = type;
+          this.x = x;
+          this.y = y;
+          this.w = w;
+          this.h = h;
+          this.angle = angle;
+          this.z = z;
+          this.resource = resource;
+          this.color = { r, g, b };
+          this.scolor = { sr, sg, sb };
+          this.time = 1.0;
+          this.easing = "";
+          this.v = 1.0;
+          this.animation = [x, y, w, h, angle, z, { r, g, b }, { sr, sg, sb }];
+        }
+        drawCameraScene(Deltatime) {
           ctx.save();
-          ctx.translate(camera.x * (1 - z) + x, camera.y * (1 - z) + y);
-          if (angle !== 0) {
-            ctx.rotate((angle * Math.PI) / 180);
-          }
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.scale(camera.zoom, camera.zoom);
+          ctx.translate(-camera.x, -camera.y);
+            /*const [
+              type,
+              x,
+              y,
+              w,
+              h,
+              angle,
+              z,
+              resource,
+              { r: r, g: g, b: b },
+              { sr: sr, sg: sb, sb: sg },
+            ] = obj;
+            const [
+              time,
+              easing,
+              v,
+              [
+                tox,
+                toy,
+                tow,
+                toh,
+                toangle,
+                toz,
+                { tor, rog, rob },
+                { tosr, tosg, tosb },
+              ],
+            ] = toobj;*/
+            if (this.type === "ccimg" && (!this.resource || !this.resource.complete)) {
+              ctx.restore();
+              return;
+            }
+            ctx.translate(camera.x * (1 - this.z) + this.x, camera.y * (1 - this.z) + this.y);
+            if (this.angle !== 0) {
+              ctx.rotate((this.angle * Math.PI) / 180);
+            }
 
-          switch (type) {
-            case "ccimg":
-              ctx.drawImage(
-                changecolor(resource, { r: r, g: g, b: b }),
-                -w / 2,
-                -(((w * resource.height) / resource.width) * h) / 2,
-                w,
-                ((w * resource.height) / resource.width) * h,
-              );
-              break;
-            case "img":
-              break;
-            case "rr":
-              ctx.beginPath();
-              ctx.fillStyle = "white";
-              ctx.roundRect(-w / 2, -h / 2, w, h, 0.0);
-              ctx.fill();
-              ctx.closePath();
-              break;
-          }
-
+            switch (this.type) {
+              case "ccimg":
+                ctx.drawImage(
+                  changecolor(this.resource, { r: this.color.r, g: this.color.g, b: this.color.b }),
+                  -this.w / 2,
+                  -(((this.w * this.resource.height) / this.resource.width) * this.h) / 2,
+                  this.w,
+                  ((this.w * this.resource.height) / this.resource.width) * this.h,
+                );
+                break;
+              case "img":
+                break;
+              case "rr":
+                ctx.beginPath();
+                ctx.fillStyle = "white";
+                ctx.roundRect(-this.w / 2, -this.h / 2, this.w, this.h, 0.0);
+                ctx.fill();
+                ctx.closePath();
+                break;
+            }
           ctx.restore();
         }
-        ctx.restore();
       }
+
+      const renderobjects = [
+        new RenderObject("rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23 }, {sr:0,sg:0,sb:0}),
+        new RenderObject("ccimg", 30, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250 },{sr:0,sg:0,sb:0}),
+      ];
 
       <!-- ------------------------------- easings ------------------------------- -->
       const al_fl = (alpha) => 4 * (alpha - 0.5) ** 3 + 0.5;
@@ -644,7 +694,10 @@
           }
         }
 
-        drawCameraScene();
+        <!-- -------------------------- game main objects -------------------------- -->
+        for(var n of renderobjects){
+          n.drawCameraScene(deltaTime);
+        }
 
         <!-- ----------------------------- animations ------------------------------ -->
         for (var n of boxes) {
