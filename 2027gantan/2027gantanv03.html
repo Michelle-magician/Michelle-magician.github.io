@@ -563,7 +563,7 @@
             switch (this.type) {
               case "ccimg":
                 ctx.drawImage(
-                  changecolor(this.resource, { r: this.color.r, g: this.color.g, b: this.color.b }),
+                  changecolor(this.resource, { r: this.color.r, g: this.color.g, b: this.color.b, a:this.color.a }),
                   -this.w / 2,
                   -(((this.w * this.resource.height) / this.resource.width) * this.h) / 2,
                   this.w,
