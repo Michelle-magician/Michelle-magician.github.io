@@ -1,0 +1,55 @@
+:root {
+    --color-primary: #6D368E;
+    --color-secondary: oklch(from var(--color-primary) calc(l + 0.1) calc(c * 0.8) h);
+    --color-background: oklch(from var(--color-primary) calc(l + 0.4) c h);
+}
+
+body {
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    font-family: "Dela Gothic One";
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    position: fixed;
+    background-color: var(--color-background);
+    color: var(--color-secondary);
+    padding: 0px;
+    text-align: center;
+    top: -10px;
+    left: 5%;
+    width: 90%;
+    height: 20%;
+    box-sizing: border-box;
+    border-radius: 10px;
+}
+
+.dela-gothic-one-regular {
+  font-family: "Dela Gothic One", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.panpan-text {
+  color: var(--color-secondary);
+  font-family: "Dela Gothic One";
+  font-weight: 400;
+  
+  line-height: 0.8;
+  letter-spacing: -0.08em;
+  
+  font-size: 18cqw;
+  white-space: normal;
+  margin: 0 !important;
+  margin-top: 20px !important;
+}
+
+@media (min-width: 700px) {
+  .panpan-text {
+    white-space: nowrap;
+    font-size: 11.5cqw;
+    margin-top: 50px !important;
+  }
+}
