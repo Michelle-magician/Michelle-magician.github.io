@@ -552,7 +552,7 @@
         drawCameraScene(Deltatime) {
           ctx.save();
           ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.scale(camera.zoom, camera.zoom);
+          ctx.scale(camera.zoom**(1+this.z), camera.zoom**(1+this.z));
           ctx.translate(-camera.x, -camera.y);
             if (this.type === "ccimg" && (!this.resource || !this.resource.complete)) {
               ctx.restore();
