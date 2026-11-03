@@ -183,6 +183,9 @@
       const sheepI = new Image();
       sheepI.src = "res/2027nenga_sheep.png";
 
+      const mtfujiI = new Image();
+      mtfujiI.src = "res/2027nenga_mtfuji.png";
+
       // -- particle --
       class touchParticle {
         constructor(x, y) {
@@ -585,8 +588,9 @@
       }
 
       const renderobjects = [
-        plane1 = new RenderObject("rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23, a:255 }, {sr:0,sg:0,sb:0}),
-        sheep = new RenderObject("ccimg", 30, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250, a:255 },{sr:0,sg:0,sb:0}),
+        mtfuji = new RenderObject("ccimg", 0, 250, 5000, 1.0, 0, 0.01, mtfujiI, { r: 255, g: 255, b: 255, a:255 },{sr:0,sg:0,sb:0}),
+        //plane1 = new RenderObject("rr", 0, 150, 1000, 230, 0.0, 0.2, "", { r: 20, g: 23, b: 23, a:255 }, {sr:0,sg:0,sb:0}),
+        sheep = new RenderObject("ccimg", 0, 0, 250, 1.0, 0, 0.4, sheepI, { r: 50, g: 255, b: 250, a:255 },{sr:0,sg:0,sb:0}),
       ];
 
       <!-- ------------------------------- easings ------------------------------- -->
@@ -623,6 +627,12 @@
         ctx.strokeStyle = "white";
         ctx.lineWidth = canvas.height / 25;
         ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+        <!-- -------------------------- game main objects -------------------------- -->
+        for(var n of renderobjects){
+          n.drawCameraScene(deltaTime);
+        }
+
         if (logoIsizeBstate > 0) {
           if (
             ((logoI.width * canvas.height) / 2500) * 1.1 <
@@ -667,12 +677,7 @@
             );
           }
         }
-
-        <!-- -------------------------- game main objects -------------------------- -->
-        for(var n of renderobjects){
-          n.drawCameraScene(deltaTime);
-        }
-
+        
         <!-- ----------------------------- animations ------------------------------ -->
         for (var n of boxes) {
           if (n.show === gamestate) {
